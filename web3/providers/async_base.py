@@ -95,8 +95,14 @@ class AsyncBaseProvider:
     _request_cache: SimpleCache
     _request_cache_lock: asyncio.Lock = asyncio.Lock()
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        cache_allowed_requests: bool = False,
+        cacheable_requests: Set[RPCEndpoint] = CACHEABLE_REQUESTS,
+    ) -> None:
         self._request_cache = SimpleCache(1000)
+        self.cache_allowed_requests = cache_allowed_requests
+        self.cacheable_requests = cacheable_requests
 
     async def request_func(
         self, async_w3: "AsyncWeb3", middleware_onion: MiddlewareOnion

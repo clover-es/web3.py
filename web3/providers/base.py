@@ -79,8 +79,14 @@ class BaseProvider:
     _request_cache: SimpleCache
     _request_cache_lock: threading.Lock = threading.Lock()
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        cache_allowed_requests: bool = False,
+        cacheable_requests: Set[RPCEndpoint] = CACHEABLE_REQUESTS,
+    ) -> None:
         self._request_cache = SimpleCache(1000)
+        self.cache_allowed_requests = cache_allowed_requests
+        self.cacheable_requests = cacheable_requests
 
     def request_func(
         self, w3: "Web3", middleware_onion: MiddlewareOnion

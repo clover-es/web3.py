@@ -38,9 +38,11 @@ def simple_cache_return_value_a():
 
 @pytest.fixture
 def w3(request_mocker):
-    _w3 = Web3(provider=BaseProvider())
-    _w3.provider.cache_allowed_requests = True
-    _w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    _w3 = Web3(
+        provider=BaseProvider(
+            cache_allowed_requests=True, cacheable_requests={"fake_endpoint"}
+        )
+    )
     with request_mocker(
         _w3,
         mock_results={
@@ -67,9 +69,9 @@ def test_request_caching_populates_cache(w3):
 
 
 def test_request_caching_does_not_cache_none_responses(request_mocker):
-    w3 = Web3(BaseProvider())
-    w3.provider.cache_allowed_requests = True
-    w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    w3 = Web3(
+        BaseProvider(cache_allowed_requests=True, cacheable_requests={"fake_endpoint"})
+    )
 
     counter = itertools.count()
 
@@ -85,9 +87,9 @@ def test_request_caching_does_not_cache_none_responses(request_mocker):
 
 
 def test_request_caching_does_not_cache_error_responses(request_mocker):
-    w3 = Web3(provider=BaseProvider())
-    w3.provider.cache_allowed_requests = True
-    w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    w3 = Web3(
+        BaseProvider(cache_allowed_requests=True, cacheable_requests={"fake_endpoint"})
+    )
 
     with request_mocker(
         w3, mock_errors={"fake_endpoint": lambda *_: {"message": f"msg-{uuid.uuid4()}"}}
@@ -113,6 +115,7 @@ def test_caching_requests_does_not_share_state_between_providers(request_mocker)
         Web3(provider=BaseProvider()),
         Web3(provider=BaseProvider()),
     )
+    # TODO: These base providers didn't have caching enabled in the original tests neither :/
     mock_results_a = {RPCEndpoint("eth_chainId"): 11111}
     mock_results_b = {RPCEndpoint("eth_chainId"): 22222}
     mock_results_c = {RPCEndpoint("eth_chainId"): 33333}
@@ -134,9 +137,11 @@ def test_caching_requests_does_not_share_state_between_providers(request_mocker)
 
 @pytest_asyncio.fixture
 async def async_w3(request_mocker):
-    _async_w3 = AsyncWeb3(AsyncBaseProvider())
-    _async_w3.provider.cache_allowed_requests = True
-    _async_w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    _async_w3 = AsyncWeb3(
+        AsyncBaseProvider(
+            cache_allowed_requests=True, cacheable_requests={"fake_endpoint"}
+        )
+    )
     async with request_mocker(
         _async_w3,
         mock_results={
@@ -170,9 +175,11 @@ async def test_async_request_caching_populates_cache(async_w3):
 
 @pytest.mark.asyncio
 async def test_async_request_caching_does_not_cache_none_responses(request_mocker):
-    async_w3 = AsyncWeb3(AsyncBaseProvider())
-    async_w3.provider.cache_allowed_requests = True
-    async_w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    async_w3 = AsyncWeb3(
+        AsyncBaseProvider(
+            cache_allowed_requests=True, cacheable_requests={"fake_endpoint"}
+        )
+    )
 
     counter = itertools.count()
 
@@ -189,9 +196,11 @@ async def test_async_request_caching_does_not_cache_none_responses(request_mocke
 
 @pytest.mark.asyncio
 async def test_async_request_caching_does_not_cache_error_responses(request_mocker):
-    async_w3 = AsyncWeb3(AsyncBaseProvider())
-    async_w3.provider.cache_allowed_requests = True
-    async_w3.provider.cacheable_requests += (RPCEndpoint("fake_endpoint"),)
+    async_w3 = AsyncWeb3(
+        AsyncBaseProvider(
+            cache_allowed_requests=True, cacheable_requests={"fake_endpoint"}
+        )
+    )
 
     async with request_mocker(
         async_w3,
@@ -223,6 +232,7 @@ async def test_async_request_caching_does_not_share_state_between_providers(
         AsyncWeb3(AsyncBaseProvider()),
         AsyncWeb3(AsyncBaseProvider()),
     )
+    # TODO: These base providers didn't have caching enabled in the original tests neither :/
     mock_results_a = {RPCEndpoint("eth_chainId"): 11111}
     mock_results_b = {RPCEndpoint("eth_chainId"): 22222}
     mock_results_c = {RPCEndpoint("eth_chainId"): 33333}
